@@ -5,5 +5,11 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
+    <style name="Theme.EasyReminder.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#6200EE</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.EasyReminder</item>
+    </style>
+
     <style name="Theme.EasyReminder" parent="Base.Theme.EasyReminder" />
 </resources>
