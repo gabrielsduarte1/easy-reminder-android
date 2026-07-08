@@ -28,6 +28,7 @@ class ReminderListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
 
         viewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
 
@@ -83,4 +84,19 @@ class ReminderListFragment : Fragment() {
             .setNegativeButton("Cancelar", null)
             .show()
     }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu, inflater: android.view.MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.settingsFragment -> {
+                findNavController().navigate(R.id.action_list_to_settings)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 }
