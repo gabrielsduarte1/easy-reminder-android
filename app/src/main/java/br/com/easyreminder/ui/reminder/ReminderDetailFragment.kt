@@ -62,13 +62,13 @@ class ReminderDetailFragment : Fragment() {
             }
         }
 
-        reminderViewModel.allReminders.observe(viewLifecycleOwner) { reminders ->
-            val reminder = reminders.find { it.id == reminderId }
-            reminder?.let {
-                currentReminder = it
-                editTextTitle.setText(it.title)
-                editTextDescription.setText(it.description)
-                selectedCategoryId = it.categoryId
+        reminderViewModel.remindersWithCategory.observe(viewLifecycleOwner) { items ->
+            val item = items.find { it.reminder.id == reminderId }
+            item?.let {
+                currentReminder = it.reminder
+                editTextTitle.setText(it.reminder.title)
+                editTextDescription.setText(it.reminder.description)
+                selectedCategoryId = it.reminder.categoryId
             }
         }
 

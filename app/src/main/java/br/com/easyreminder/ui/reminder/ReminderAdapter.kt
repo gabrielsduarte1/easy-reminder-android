@@ -1,5 +1,6 @@
 package br.com.easyreminder.ui.reminder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,19 +9,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.easyreminder.R
-import br.com.easyreminder.model.Reminder
+import br.com.easyreminder.model.ReminderWithCategory
 
 class ReminderAdapter(
-    private val onClick: (Reminder) -> Unit,
-    private val onLongClick: (Reminder) -> Unit
-) : ListAdapter<Reminder, ReminderAdapter.ReminderViewHolder>(DiffCallback) {
+    private val onClick: (ReminderWithCategory) -> Unit,
+    private val onLongClick: (ReminderWithCategory) -> Unit
+) : ListAdapter<ReminderWithCategory, ReminderAdapter.ReminderViewHolder>(DiffCallback) {
 
-    companion object DiffCallback : DiffUtil.ItemCallback<Reminder>() {
-        override fun areItemsTheSame(oldItem: Reminder, newItem: Reminder): Boolean {
-            return oldItem.id == newItem.id
+    companion object DiffCallback : DiffUtil.ItemCallback<ReminderWithCategory>() {
+        override fun areItemsTheSame(oldItem: ReminderWithCategory, newItem: ReminderWithCategory): Boolean {
+            return oldItem.reminder.id == newItem.reminder.id
         }
 
-        override fun areContentsTheSame(oldItem: Reminder, newItem: Reminder): Boolean {
+        override fun areContentsTheSame(oldItem: ReminderWithCategory, newItem: ReminderWithCategory): Boolean {
             return oldItem == newItem
         }
     }
@@ -39,14 +40,19 @@ class ReminderAdapter(
     }
 
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
-        val reminder = getItem(position)
-        holder.title.text = reminder.title
-        holder.description.text = reminder.description
-        holder.categoryName.text = "Sem categoria"
+        val item = getItem(position)
+        holder.title.text = item.reminder.title
+        holder.description.text = item.reminder.description
 
-        holder.itemView.setOnClickListener { onClick(reminder) }
+        val color = item.category?.color ?: "#CCCCCC"
+        holder.categoryColor.setBackgroundColor(Color.parseColor(color))
+
+        holder.categoryName.text = item.category?.name ?: "Sem categoria"
+        holder.categoryName.setTextColor(Color.parseColor(color))
+
+        holder.itemView.setOnClickListener { onClick(item) }
         holder.itemView.setOnLongClickListener {
-            onLongClick(reminder)
+            onLongClick(item)
             true
         }
     }

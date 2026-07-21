@@ -33,13 +33,13 @@ class ReminderListFragment : Fragment() {
         viewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
 
         adapter = ReminderAdapter(
-            onClick = { reminder ->
+            onClick = { item ->
                 val action = ReminderListFragmentDirections
-                    .actionListToDetail(reminder.id)
+                    .actionListToDetail(item.reminder.id)
                 findNavController().navigate(action)
             },
-            onLongClick = { reminder ->
-                showContextMenu(reminder)
+            onLongClick = { item ->
+                showContextMenu(item.reminder)
             }
         )
 
@@ -52,8 +52,22 @@ class ReminderListFragment : Fragment() {
             findNavController().navigate(R.id.action_list_to_create)
         }
 
-        viewModel.allReminders.observe(viewLifecycleOwner) { reminders ->
-            adapter.submitList(reminders)
+        viewModel.remindersWithCategory.observe(viewLifecycleOwner) { items ->
+            adapter.submitList(items)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu, inflater: android.view.MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.settingsFragment -> {
+                findNavController().navigate(R.id.action_list_to_settings)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -84,19 +98,4 @@ class ReminderListFragment : Fragment() {
             .setNegativeButton("Cancelar", null)
             .show()
     }
-
-    override fun onCreateOptionsMenu(menu: android.view.Menu, inflater: android.view.MenuInflater) {
-        inflater.inflate(R.menu.menu_main, menu)
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.settingsFragment -> {
-                findNavController().navigate(R.id.action_list_to_settings)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
 }
