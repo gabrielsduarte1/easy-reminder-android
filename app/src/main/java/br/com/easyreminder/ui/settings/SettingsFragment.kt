@@ -1,6 +1,5 @@
 package br.com.easyreminder.ui.settings
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -74,24 +73,71 @@ class SettingsFragment : Fragment() {
         val editText = EditText(requireContext())
         editText.hint = "Nome da categoria"
 
+        var selectedColor = "#FF5252"
+
+        val colors = listOf(
+            "#FF5252", "#448AFF", "#69F0AE", "#FFD740",
+            "#E040FB", "#FF6D00", "#F48FB1", "#4DD0E1"
+        )
+
+        val colorNames = listOf(
+            "🔴 Vermelho",
+            "🔵 Azul",
+            "🟢 Verde",
+            "🟡 Amarelo",
+            "🟣 Roxo",
+            "🟠 Laranja",
+            "🩷 Rosa",
+            "🩵 Ciano"
+        ).toTypedArray()
+
         android.app.AlertDialog.Builder(requireContext())
             .setTitle("Nova categoria")
             .setView(editText)
             .setPositiveButton("Salvar") { _, _ ->
                 val name = editText.text.toString().trim()
                 if (name.isNotEmpty()) {
-                    val colors = listOf("#FF5252", "#448AFF", "#69F0AE", "#FFD740", "#E040FB")
-                    val randomColor = colors.random()
-                    categoryViewModel.insert(Category(name = name, color = randomColor))
+                    categoryViewModel.insert(Category(name = name, color = selectedColor))
                 }
             }
             .setNegativeButton("Cancelar", null)
+            .setNeutralButton("Escolher cor") { _, _ -> }
             .show()
+            .also { dialog ->
+                dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                    android.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Escolha uma cor")
+                        .setItems(colorNames) { _, index ->
+                            selectedColor = colors[index]
+                            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)
+                                .setTextColor(android.graphics.Color.parseColor(selectedColor))
+                        }
+                        .show()
+                }
+            }
     }
 
     private fun showEditCategoryDialog(category: Category) {
         val editText = EditText(requireContext())
         editText.setText(category.name)
+
+        var selectedColor = category.color
+
+        val colors = listOf(
+            "#FF5252", "#448AFF", "#69F0AE", "#FFD740",
+            "#E040FB", "#FF6D00", "#F48FB1", "#4DD0E1"
+        )
+
+        val colorNames = listOf(
+            "🔴 Vermelho",
+            "🔵 Azul",
+            "🟢 Verde",
+            "🟡 Amarelo",
+            "🟣 Roxo",
+            "🟠 Laranja",
+            "🩷 Rosa",
+            "🩵 Ciano"
+        ).toTypedArray()
 
         android.app.AlertDialog.Builder(requireContext())
             .setTitle("Editar categoria")
@@ -99,13 +145,27 @@ class SettingsFragment : Fragment() {
             .setPositiveButton("Salvar") { _, _ ->
                 val name = editText.text.toString().trim()
                 if (name.isNotEmpty()) {
-                    categoryViewModel.update(category.copy(name = name))
+                    categoryViewModel.update(category.copy(name = name, color = selectedColor))
                 }
             }
-            .setNeutralButton("Excluir") { _, _ ->
+            .setNeutralButton("Escolher cor") { _, _ -> }
+            .setNegativeButton("Excluir") { _, _ ->
                 categoryViewModel.delete(category)
             }
-            .setNegativeButton("Cancelar", null)
             .show()
+            .also { dialog ->
+                dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)
+                    .setTextColor(android.graphics.Color.parseColor(selectedColor))
+                dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                    android.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Escolha uma cor")
+                        .setItems(colorNames) { _, index ->
+                            selectedColor = colors[index]
+                            dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL)
+                                .setTextColor(android.graphics.Color.parseColor(selectedColor))
+                        }
+                        .show()
+                }
+            }
     }
 }
