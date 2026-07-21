@@ -50,6 +50,14 @@ class ReminderAdapter(
         holder.categoryName.text = item.category?.name ?: "Sem categoria"
         holder.categoryName.setTextColor(Color.parseColor(color))
 
+        val bgColor = Color.parseColor(color)
+        val background = android.graphics.drawable.GradientDrawable()
+        background.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+        background.cornerRadius = 32f
+        background.setColor(bgColor)
+        background.alpha = 51
+        holder.categoryName.background = background
+
         holder.itemView.setOnClickListener { onClick(item) }
         holder.itemView.setOnLongClickListener {
             onLongClick(item)
