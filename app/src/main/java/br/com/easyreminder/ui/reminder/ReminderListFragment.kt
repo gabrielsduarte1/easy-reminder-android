@@ -47,6 +47,8 @@ class ReminderListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        val layoutEmpty = view.findViewById<android.widget.LinearLayout>(R.id.layoutEmpty)
+
         val fab = view.findViewById<FloatingActionButton>(R.id.fabAddReminder)
         fab.setOnClickListener {
             findNavController().navigate(R.id.action_list_to_create)
@@ -54,6 +56,13 @@ class ReminderListFragment : Fragment() {
 
         viewModel.remindersWithCategory.observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
+            if (items.isEmpty()) {
+                recyclerView.visibility = android.view.View.GONE
+                layoutEmpty.visibility = android.view.View.VISIBLE
+            } else {
+                recyclerView.visibility = android.view.View.VISIBLE
+                layoutEmpty.visibility = android.view.View.GONE
+            }
         }
     }
 
