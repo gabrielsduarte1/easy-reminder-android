@@ -31,6 +31,8 @@ class ReminderAdapter(
         val description: TextView = itemView.findViewById(R.id.textViewDescription)
         val categoryColor: View = itemView.findViewById(R.id.viewCategoryColor)
         val categoryName: TextView = itemView.findViewById(R.id.textViewCategory)
+
+        val dateTime: TextView = itemView.findViewById(R.id.textViewDateTime)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReminderViewHolder {
@@ -57,6 +59,13 @@ class ReminderAdapter(
         background.setColor(bgColor)
         background.alpha = 51
         holder.categoryName.background = background
+
+        if (item.reminder.dateTime != null) {
+            holder.dateTime.visibility = android.view.View.VISIBLE
+            holder.dateTime.text = "🕐 ${item.reminder.dateTime}"
+        } else {
+            holder.dateTime.visibility = android.view.View.GONE
+        }
 
         holder.itemView.setOnClickListener { onClick(item) }
         holder.itemView.setOnLongClickListener {

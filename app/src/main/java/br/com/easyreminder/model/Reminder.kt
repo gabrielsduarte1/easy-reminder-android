@@ -16,5 +16,8 @@ data class Reminder(
     val description: String = "",
 
     @ColumnInfo(name = "category_id")
-    val categoryId: Int? = null
+    val categoryId: Int? = null,
+
+    @ColumnInfo(name = "date_time")
+    val dateTime: String? = null
 )

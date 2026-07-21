@@ -51,6 +51,34 @@ class ReminderCreateFragment : Fragment() {
         autoCompleteCategory = view.findViewById(R.id.autoCompleteCategory)
         buttonSave = view.findViewById(R.id.buttonSave)
 
+        val editTextDateTime = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editTextDateTime)
+
+        editTextDateTime.setOnClickListener {
+            val calendar = java.util.Calendar.getInstance()
+
+            android.app.DatePickerDialog(
+                requireContext(),
+                { _, year, month, day ->
+                    android.app.TimePickerDialog(
+                        requireContext(),
+                        { _, hour, minute ->
+                            val dateTime = String.format(
+                                "%02d/%02d/%04d %02d:%02d",
+                                day, month + 1, year, hour, minute
+                            )
+                            editTextDateTime.setText(dateTime)
+                        },
+                        calendar.get(java.util.Calendar.HOUR_OF_DAY),
+                        calendar.get(java.util.Calendar.MINUTE),
+                        true
+                    ).show()
+                },
+                calendar.get(java.util.Calendar.YEAR),
+                calendar.get(java.util.Calendar.MONTH),
+                calendar.get(java.util.Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
         categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             val names = categories.map { it.name }
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
@@ -73,8 +101,9 @@ class ReminderCreateFragment : Fragment() {
 
             val reminder = Reminder(
                 title = title,
-                description = description,
-                categoryId = selectedCategoryId
+                description = editTextDescription.text.toString().trim(),
+                categoryId = selectedCategoryId,
+                dateTime = editTextDateTime.text.toString().trim().ifEmpty { null }
             )
 
             reminderViewModel.insert(reminder)

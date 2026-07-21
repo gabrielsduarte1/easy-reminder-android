@@ -47,6 +47,16 @@
                 android:ellipsize="end" />
 
             <TextView
+                android:id="@+id/textViewDateTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="11sp"
+                android:textColor="?attr/colorPrimary"
+                android:drawablePadding="4dp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/textViewCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
