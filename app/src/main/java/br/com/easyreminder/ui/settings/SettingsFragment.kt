@@ -62,6 +62,11 @@ class SettingsFragment : Fragment() {
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
+            requireContext()
+                .getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("dark_mode", isChecked)
+                .apply()
         }
     }
 
