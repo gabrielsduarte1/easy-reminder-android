@@ -13,6 +13,7 @@ import br.com.easyreminder.R
 import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.viewmodel.CategoryViewModel
 import br.com.easyreminder.viewmodel.ReminderViewModel
+import br.com.easyreminder.worker.ReminderScheduler
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -90,6 +91,8 @@ class ReminderDetailFragment : Fragment() {
 
             updated?.let {
                 reminderViewModel.update(it)
+                ReminderScheduler.cancel(requireContext(), it.id)
+                ReminderScheduler.schedule(requireContext(), it)
                 findNavController().navigateUp()
             }
         }
@@ -101,6 +104,7 @@ class ReminderDetailFragment : Fragment() {
                 .setPositiveButton("Excluir") { _, _ ->
                     currentReminder?.let {
                         reminderViewModel.delete(it)
+                        ReminderScheduler.cancel(requireContext(), it.id)
                         findNavController().navigateUp()
                     }
                 }
