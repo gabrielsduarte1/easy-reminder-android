@@ -11,15 +11,28 @@
 
         <action
             android:id="@+id/action_list_to_create"
-            app:destination="@+id/reminderCreateFragment" />
+            app:destination="@id/reminderCreateFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
 
         <action
             android:id="@+id/action_list_to_detail"
-            app:destination="@+id/reminderDetailFragment" />
+            app:destination="@id/reminderDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
 
         <action
             android:id="@+id/action_list_to_settings"
-            app:destination="@+id/settingsFragment" />
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
     </fragment>
 
     <fragment
@@ -43,6 +56,5 @@
         android:id="@+id/settingsFragment"
         android:name="br.com.easyreminder.ui.settings.SettingsFragment"
         android:label="Configurações" />
-
 
 </navigation>
