@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import br.com.easyreminder.R
 import br.com.easyreminder.model.Reminder
+import br.com.easyreminder.ui.components.ComponentButton
 import br.com.easyreminder.viewmodel.CategoryViewModel
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
@@ -48,7 +49,7 @@ class ReminderDetailFragment : Fragment() {
         val editTextTitle = view.findViewById<TextInputEditText>(R.id.editTextTitle)
         val editTextDescription = view.findViewById<TextInputEditText>(R.id.editTextDescription)
         val autoCompleteCategory = view.findViewById<AutoCompleteTextView>(R.id.autoCompleteCategory)
-        val buttonSave = view.findViewById<MaterialButton>(R.id.buttonSave)
+        val buttonSave = view.findViewById<ComponentButton>(R.id.buttonSave)
         val buttonDelete = view.findViewById<MaterialButton>(R.id.buttonDelete)
 
         var selectedCategoryId: Int? = null
