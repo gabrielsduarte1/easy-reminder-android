@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "br.com.easyreminder"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "br.com.easyreminder"
@@ -23,8 +23,11 @@ android {
         release {
             isMinifyEnabled = false
         }
-        buildFeatures.viewBinding = true
     }
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

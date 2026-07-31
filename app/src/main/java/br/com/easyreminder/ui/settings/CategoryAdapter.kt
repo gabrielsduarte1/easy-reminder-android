@@ -2,14 +2,11 @@ package br.com.easyreminder.ui.settings
 
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import br.com.easyreminder.R
+import br.com.easyreminder.databinding.ItemCategoryBinding
 import br.com.easyreminder.model.Category
 
 class CategoryAdapter(
@@ -26,22 +23,19 @@ class CategoryAdapter(
         }
     }
 
-    inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val colorView: View = itemView.findViewById(R.id.viewColor)
-        val name: TextView = itemView.findViewById(R.id.textViewCategoryName)
-        val editButton: ImageButton = itemView.findViewById(R.id.buttonEditCategory)
-    }
+    inner class CategoryViewHolder(val binding: ItemCategoryBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_category, parent, false)
-        return CategoryViewHolder(view)
+        val binding = ItemCategoryBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return CategoryViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = getItem(position)
-        holder.name.text = category.name
-        holder.colorView.setBackgroundColor(Color.parseColor(category.color))
-        holder.editButton.setOnClickListener { onEdit(category) }
+        holder.binding.textViewCategoryName.text = category.name
+        holder.binding.viewColor.setBackgroundColor(Color.parseColor(category.color))
+        holder.binding.buttonEditCategory.setOnClickListener { onEdit(category) }
     }
 }

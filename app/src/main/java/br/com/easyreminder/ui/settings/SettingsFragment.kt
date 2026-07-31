@@ -9,24 +9,25 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import br.com.easyreminder.R
+import br.com.easyreminder.databinding.FragmentSettingsBinding
 import br.com.easyreminder.model.Category
 import br.com.easyreminder.viewmodel.CategoryViewModel
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsFragment : Fragment() {
 
     private lateinit var categoryViewModel: CategoryViewModel
     private lateinit var adapter: CategoryAdapter
 
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+    ): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,24 +39,21 @@ class SettingsFragment : Fragment() {
             showEditCategoryDialog(category)
         }
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewCategories)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewCategories.adapter = adapter
+        binding.recyclerViewCategories.layoutManager = LinearLayoutManager(requireContext())
 
         categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             adapter.submitList(categories)
         }
 
-        val buttonAddCategory = view.findViewById<MaterialButton>(R.id.buttonAddCategory)
-        buttonAddCategory.setOnClickListener {
+        binding.buttonAddCategory.setOnClickListener {
             showAddCategoryDialog()
         }
 
-        val switchDarkTheme = view.findViewById<SwitchMaterial>(R.id.switchDarkTheme)
         val currentMode = AppCompatDelegate.getDefaultNightMode()
-        switchDarkTheme.isChecked = currentMode == AppCompatDelegate.MODE_NIGHT_YES
+        binding.switchDarkTheme.isChecked = currentMode == AppCompatDelegate.MODE_NIGHT_YES
 
-        switchDarkTheme.setOnCheckedChangeListener { _, isChecked ->
+        binding.switchDarkTheme.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             } else {
@@ -167,5 +165,10 @@ class SettingsFragment : Fragment() {
                         .show()
                 }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -10,21 +10,25 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.easyreminder.R
+import br.com.easyreminder.databinding.FragmentReminderListBinding
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ReminderListFragment : Fragment() {
 
     private lateinit var viewModel: ReminderViewModel
     private lateinit var adapter: ReminderAdapter
 
+    private var _binding: FragmentReminderListBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_reminder_list, container, false)
+    ): View {
+        _binding = FragmentReminderListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,25 +48,21 @@ class ReminderListFragment : Fragment() {
             }
         )
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewReminders)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewReminders.adapter = adapter
+        binding.recyclerViewReminders.layoutManager = LinearLayoutManager(requireContext())
 
-        val fab = view.findViewById<FloatingActionButton>(R.id.fabAddReminder)
-        fab.setOnClickListener {
+        binding.fabAddReminder.setOnClickListener {
             findNavController().navigate(R.id.action_list_to_create)
         }
-
-        val layoutEmpty = view.findViewById<android.widget.LinearLayout>(R.id.layoutEmpty)
 
         viewModel.remindersWithCategory.observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
             if (items.isEmpty()) {
-                recyclerView.visibility = View.GONE
-                layoutEmpty.visibility = View.VISIBLE
+                binding.recyclerViewReminders.visibility = View.GONE
+                binding.layoutEmpty.visibility = View.VISIBLE
             } else {
-                recyclerView.visibility = View.VISIBLE
-                layoutEmpty.visibility = View.GONE
+                binding.recyclerViewReminders.visibility = View.VISIBLE
+                binding.layoutEmpty.visibility = View.GONE
             }
         }
 
@@ -178,8 +178,11 @@ class ReminderListFragment : Fragment() {
                 }
             }
         )
-        itemTouchHelper.attachToRecyclerView(
-            requireView().findViewById(R.id.recyclerViewReminders)
-        )
+        itemTouchHelper.attachToRecyclerView(binding.recyclerViewReminders)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

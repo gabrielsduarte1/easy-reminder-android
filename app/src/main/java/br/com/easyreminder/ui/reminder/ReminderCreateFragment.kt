@@ -5,30 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import br.com.easyreminder.R
+import br.com.easyreminder.databinding.FragmentReminderCreateBinding
 import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.viewmodel.CategoryViewModel
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
 class ReminderCreateFragment : Fragment() {
 
     private lateinit var reminderViewModel: ReminderViewModel
     private lateinit var categoryViewModel: CategoryViewModel
 
-    private lateinit var tilTitle: TextInputLayout
-    private lateinit var editTextTitle: TextInputEditText
-    private lateinit var editTextDescription: TextInputEditText
-    private lateinit var autoCompleteCategory: AutoCompleteTextView
-    private lateinit var buttonSave: MaterialButton
+    private var _binding: FragmentReminderCreateBinding? = null
+    private val binding get() = _binding!!
 
     private var selectedCategoryId: Int? = null
 
@@ -36,8 +28,9 @@ class ReminderCreateFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_reminder_create, container, false)
+    ): View {
+        _binding = FragmentReminderCreateBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,15 +39,7 @@ class ReminderCreateFragment : Fragment() {
         reminderViewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
         categoryViewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
 
-        tilTitle = view.findViewById(R.id.tilTitle)
-        editTextTitle = view.findViewById(R.id.editTextTitle)
-        editTextDescription = view.findViewById(R.id.editTextDescription)
-        autoCompleteCategory = view.findViewById(R.id.autoCompleteCategory)
-        buttonSave = view.findViewById(R.id.buttonSave)
-
-        val editTextDateTime = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editTextDateTime)
-
-        editTextDateTime.setOnClickListener {
+        binding.editTextDateTime.setOnClickListener {
             val calendar = java.util.Calendar.getInstance()
 
             android.app.DatePickerDialog(
@@ -67,7 +52,7 @@ class ReminderCreateFragment : Fragment() {
                                 "%02d/%02d/%04d %02d:%02d",
                                 day, month + 1, year, hour, minute
                             )
-                            editTextDateTime.setText(dateTime)
+                            binding.editTextDateTime.setText(dateTime)
                         },
                         calendar.get(java.util.Calendar.HOUR_OF_DAY),
                         calendar.get(java.util.Calendar.MINUTE),
@@ -83,33 +68,38 @@ class ReminderCreateFragment : Fragment() {
         categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             val names = categories.map { it.name }
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
-            autoCompleteCategory.setAdapter(adapter)
-            autoCompleteCategory.setOnItemClickListener { _, _, position, _ ->
+            binding.autoCompleteCategory.setAdapter(adapter)
+            binding.autoCompleteCategory.setOnItemClickListener { _, _, position, _ ->
                 selectedCategoryId = categories[position].id
             }
         }
 
-        buttonSave.setOnClickListener {
-            val title = editTextTitle.text.toString().trim()
-            val description = editTextDescription.text.toString().trim()
+        binding.buttonSave.setOnClickListener {
+            val title = binding.editTextTitle.text.toString().trim()
+            val description = binding.editTextDescription.text.toString().trim()
 
             if (title.isEmpty()) {
-                tilTitle.error = "O título é obrigatório"
+                binding.tilTitle.error = "O título é obrigatório"
                 return@setOnClickListener
             }
 
-            tilTitle.error = null
+            binding.tilTitle.error = null
 
             val reminder = Reminder(
                 title = title,
-                description = editTextDescription.text.toString().trim(),
+                description = description,
                 categoryId = selectedCategoryId,
-                dateTime = editTextDateTime.text.toString().trim().ifEmpty { null }
+                dateTime = binding.editTextDateTime.text.toString().trim().ifEmpty { null }
             )
 
             reminderViewModel.insert(reminder)
             ReminderScheduler.schedule(requireContext(), reminder)
             findNavController().navigateUp()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

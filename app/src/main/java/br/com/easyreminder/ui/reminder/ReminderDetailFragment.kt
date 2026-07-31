@@ -5,19 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import br.com.easyreminder.R
+import br.com.easyreminder.databinding.FragmentReminderDetailBinding
 import br.com.easyreminder.model.Reminder
-import br.com.easyreminder.ui.components.ComponentButton
 import br.com.easyreminder.viewmodel.CategoryViewModel
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
 class ReminderDetailFragment : Fragment() {
 
@@ -25,6 +20,9 @@ class ReminderDetailFragment : Fragment() {
     private lateinit var categoryViewModel: CategoryViewModel
     private var reminderId: Int = -1
     private var currentReminder: Reminder? = null
+
+    private var _binding: FragmentReminderDetailBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +33,9 @@ class ReminderDetailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_reminder_detail, container, false)
+    ): View {
+        _binding = FragmentReminderDetailBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,21 +44,14 @@ class ReminderDetailFragment : Fragment() {
         reminderViewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
         categoryViewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
 
-        val tilTitle = view.findViewById<TextInputLayout>(R.id.tilTitle)
-        val editTextTitle = view.findViewById<TextInputEditText>(R.id.editTextTitle)
-        val editTextDescription = view.findViewById<TextInputEditText>(R.id.editTextDescription)
-        val autoCompleteCategory = view.findViewById<AutoCompleteTextView>(R.id.autoCompleteCategory)
-        val buttonSave = view.findViewById<ComponentButton>(R.id.buttonSave)
-        val buttonDelete = view.findViewById<MaterialButton>(R.id.buttonDelete)
-
         var selectedCategoryId: Int? = null
 
         categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             val categoryNames = categories.map { it.name }
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categoryNames)
-            autoCompleteCategory.setAdapter(adapter)
+            binding.autoCompleteCategory.setAdapter(adapter)
 
-            autoCompleteCategory.setOnItemClickListener { _, _, position, _ ->
+            binding.autoCompleteCategory.setOnItemClickListener { _, _, position, _ ->
                 selectedCategoryId = categories[position].id
             }
         }
@@ -68,25 +60,25 @@ class ReminderDetailFragment : Fragment() {
             val item = items.find { it.reminder.id == reminderId }
             item?.let {
                 currentReminder = it.reminder
-                editTextTitle.setText(it.reminder.title)
-                editTextDescription.setText(it.reminder.description)
+                binding.editTextTitle.setText(it.reminder.title)
+                binding.editTextDescription.setText(it.reminder.description)
                 selectedCategoryId = it.reminder.categoryId
             }
         }
 
-        buttonSave.setOnClickListener {
-            val title = editTextTitle.text.toString().trim()
+        binding.buttonSave.setOnClickListener {
+            val title = binding.editTextTitle.text.toString().trim()
 
             if (title.isEmpty()) {
-                tilTitle.error = "O título é obrigatório"
+                binding.tilTitle.error = "O título é obrigatório"
                 return@setOnClickListener
             }
 
-            tilTitle.error = null
+            binding.tilTitle.error = null
 
             val updated = currentReminder?.copy(
                 title = title,
-                description = editTextDescription.text.toString().trim(),
+                description = binding.editTextDescription.text.toString().trim(),
                 categoryId = selectedCategoryId
             )
 
@@ -98,7 +90,7 @@ class ReminderDetailFragment : Fragment() {
             }
         }
 
-        buttonDelete.setOnClickListener {
+        binding.buttonDelete.setOnClickListener {
             android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Excluir lembrete")
                 .setMessage("Deseja excluir \"${currentReminder?.title}\"?")
@@ -112,5 +104,10 @@ class ReminderDetailFragment : Fragment() {
                 .setNegativeButton("Cancelar", null)
                 .show()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
