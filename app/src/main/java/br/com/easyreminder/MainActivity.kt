@@ -17,7 +17,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
+
         val prefs = getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
         val isDarkMode = prefs.getBoolean("dark_mode", false)
         if (isDarkMode) {
@@ -25,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
-        installSplashScreen()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
