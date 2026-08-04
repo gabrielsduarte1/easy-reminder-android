@@ -13,6 +13,7 @@ import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.viewmodel.CategoryViewModel
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
+import androidx.core.widget.doOnTextChanged
 
 class ReminderCreateFragment : Fragment() {
 
@@ -38,6 +39,9 @@ class ReminderCreateFragment : Fragment() {
 
         reminderViewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
         categoryViewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
+        binding.editTextTitle.doOnTextChanged { text, _, _, _ ->
+            binding.buttonSave.isEnabled = !text.isNullOrBlank()
+        }
 
         binding.editTextDateTime.setOnClickListener {
             val calendar = java.util.Calendar.getInstance()

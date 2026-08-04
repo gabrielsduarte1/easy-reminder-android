@@ -80,7 +80,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Salvar lembrete"
-            android:textAllCaps="false" />
+            android:textAllCaps="false"
+            android:enabled="false"/>
 
     </LinearLayout>
 
