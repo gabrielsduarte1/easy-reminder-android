@@ -42,12 +42,25 @@ class ReminderCreateFragment : Fragment() {
         binding.editTextDateTime.setOnClickListener {
             val calendar = java.util.Calendar.getInstance()
 
-            android.app.DatePickerDialog(
+            val datePickerDialog = android.app.DatePickerDialog(
                 requireContext(),
                 { _, year, month, day ->
                     android.app.TimePickerDialog(
                         requireContext(),
                         { _, hour, minute ->
+                            val selectedDateTime = java.util.Calendar.getInstance().apply {
+                                set(year, month, day, hour, minute, 0)
+                            }
+
+                            if (selectedDateTime.before(java.util.Calendar.getInstance())) {
+                                android.widget.Toast.makeText(
+                                    requireContext(),
+                                    "Escolha um horário que ainda não passou",
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                                return@TimePickerDialog
+                            }
+
                             val dateTime = String.format(
                                 "%02d/%02d/%04d %02d:%02d",
                                 day, month + 1, year, hour, minute
@@ -62,7 +75,11 @@ class ReminderCreateFragment : Fragment() {
                 calendar.get(java.util.Calendar.YEAR),
                 calendar.get(java.util.Calendar.MONTH),
                 calendar.get(java.util.Calendar.DAY_OF_MONTH)
-            ).show()
+            )
+
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+
+            datePickerDialog.show()
         }
 
         categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
