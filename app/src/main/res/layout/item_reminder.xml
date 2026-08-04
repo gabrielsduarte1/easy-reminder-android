@@ -21,8 +21,9 @@
             android:background="#FF5252" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:padding="12dp">
 
@@ -33,7 +34,9 @@
                 android:text="Título do lembrete"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textColor="@android:color/black"
+                android:maxLines="2"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/textViewDescription"
@@ -45,16 +48,6 @@
                 android:textColor="@android:color/darker_gray"
                 android:maxLines="2"
                 android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/textViewDateTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="11sp"
-                android:textColor="?attr/colorPrimary"
-                android:drawablePadding="4dp"
-                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/textViewCategory"
@@ -69,6 +62,18 @@
                 android:paddingVertical="2dp" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            android:paddingEnd="12dp"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary"
+            android:gravity="end"
+            android:visibility="gone" />
 
     </LinearLayout>
 
