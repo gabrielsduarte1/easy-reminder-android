@@ -66,7 +66,7 @@ class ReminderListFragment : Fragment() {
             }
         }
 
-        setupSwipeToDelete()
+        setupSwipeGestures()
     }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu, inflater: android.view.MenuInflater) {
@@ -111,10 +111,37 @@ class ReminderListFragment : Fragment() {
             .show()
     }
 
-    private fun setupSwipeToDelete() {
+    private fun toggleCompleted(reminder: br.com.easyreminder.model.Reminder) {
+        val updated = reminder.copy(isCompleted = !reminder.isCompleted)
+        viewModel.update(updated)
+
+        if (updated.isCompleted) {
+            ReminderScheduler.cancel(requireContext(), updated.id)
+        } else if (!updated.dateTime.isNullOrBlank()) {
+            ReminderScheduler.schedule(requireContext(), updated)
+        }
+
+        val message = if (updated.isCompleted) "Lembrete concluído" else "Lembrete pendente novamente"
+
+        com.google.android.material.snackbar.Snackbar.make(
+            requireView(),
+            message,
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).setAction("DESFAZER") {
+            viewModel.update(reminder)
+            if (reminder.isCompleted) {
+                ReminderScheduler.cancel(requireContext(), reminder.id)
+            } else if (!reminder.dateTime.isNullOrBlank()) {
+                ReminderScheduler.schedule(requireContext(), reminder)
+            }
+        }.show()
+    }
+
+    private fun setupSwipeGestures() {
         val itemTouchHelper = androidx.recyclerview.widget.ItemTouchHelper(
             object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(
-                0, androidx.recyclerview.widget.ItemTouchHelper.LEFT
+                0,
+                androidx.recyclerview.widget.ItemTouchHelper.LEFT or androidx.recyclerview.widget.ItemTouchHelper.RIGHT
             ) {
                 override fun onMove(
                     recyclerView: RecyclerView,
@@ -130,17 +157,21 @@ class ReminderListFragment : Fragment() {
                     val item = adapter.currentList[position]
                     val reminder = item.reminder
 
-                    viewModel.delete(reminder)
-                    ReminderScheduler.cancel(requireContext(), reminder.id)
+                    if (direction == androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
+                        viewModel.delete(reminder)
+                        ReminderScheduler.cancel(requireContext(), reminder.id)
 
-                    com.google.android.material.snackbar.Snackbar.make(
-                        requireView(),
-                        "Lembrete excluído",
-                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                    ).setAction("DESFAZER") {
-                        viewModel.insert(reminder)
-                        ReminderScheduler.schedule(requireContext(), reminder)
-                    }.show()
+                        com.google.android.material.snackbar.Snackbar.make(
+                            requireView(),
+                            "Lembrete excluído",
+                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                        ).setAction("DESFAZER") {
+                            viewModel.insert(reminder)
+                            ReminderScheduler.schedule(requireContext(), reminder)
+                        }.show()
+                    } else {
+                    toggleCompleted(reminder)
+                }
                 }
 
                 override fun onChildDraw(
@@ -153,27 +184,53 @@ class ReminderListFragment : Fragment() {
                 ) {
                     val itemView = viewHolder.itemView
                     val paint = android.graphics.Paint()
-                    paint.color = android.graphics.Color.parseColor("#E24B4A")
-                    canvas.drawRect(
-                        itemView.right + dX,
-                        itemView.top.toFloat(),
-                        itemView.right.toFloat(),
-                        itemView.bottom.toFloat(),
-                        paint
-                    )
-                    val icon = androidx.core.content.ContextCompat.getDrawable(
-                        requireContext(),
-                        android.R.drawable.ic_menu_delete
-                    )
-                    icon?.let {
-                        val iconMargin = (itemView.height - it.intrinsicHeight) / 2
-                        val iconTop = itemView.top + iconMargin
-                        val iconBottom = iconTop + it.intrinsicHeight
-                        val iconLeft = itemView.right - iconMargin - it.intrinsicWidth
-                        val iconRight = itemView.right - iconMargin
-                        it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                        it.draw(canvas)
+
+                    if (dX < 0) {
+                        paint.color = android.graphics.Color.parseColor("#E24B4A")
+                        canvas.drawRect(
+                            itemView.right + dX,
+                            itemView.top.toFloat(),
+                            itemView.right.toFloat(),
+                            itemView.bottom.toFloat(),
+                            paint
+                        )
+                        val icon = androidx.core.content.ContextCompat.getDrawable(
+                            requireContext(),
+                            android.R.drawable.ic_menu_delete
+                        )
+                        icon?.let {
+                            val iconMargin = (itemView.height - it.intrinsicHeight) / 2
+                            val iconTop = itemView.top + iconMargin
+                            val iconBottom = iconTop + it.intrinsicHeight
+                            val iconLeft = itemView.right - iconMargin - it.intrinsicWidth
+                            val iconRight = itemView.right - iconMargin
+                            it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                            it.draw(canvas)
+                        }
+                    } else if (dX > 0) {
+                        paint.color = android.graphics.Color.parseColor("#4CAF50")
+                        canvas.drawRect(
+                            itemView.left.toFloat(),
+                            itemView.top.toFloat(),
+                            itemView.left + dX,
+                            itemView.bottom.toFloat(),
+                            paint
+                        )
+                        val icon = androidx.core.content.ContextCompat.getDrawable(
+                            requireContext(),
+                            android.R.drawable.checkbox_on_background
+                        )
+                        icon?.let {
+                            val iconMargin = (itemView.height - it.intrinsicHeight) / 2
+                            val iconTop = itemView.top + iconMargin
+                            val iconBottom = iconTop + it.intrinsicHeight
+                            val iconLeft = itemView.left + iconMargin
+                            val iconRight = iconLeft + it.intrinsicWidth
+                            it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                            it.draw(canvas)
+                        }
                     }
+
                     super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                 }
             }

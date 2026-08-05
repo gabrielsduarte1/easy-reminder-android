@@ -19,5 +19,8 @@ data class Reminder(
     val categoryId: Int? = null,
 
     @ColumnInfo(name = "date_time")
-    val dateTime: String? = null
+    val dateTime: String? = null,
+
+    @ColumnInfo(name = "is_completed", defaultValue = "0")
+    val isCompleted: Boolean = false
 )
