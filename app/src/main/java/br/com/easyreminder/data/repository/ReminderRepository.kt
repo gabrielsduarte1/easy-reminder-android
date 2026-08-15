@@ -3,8 +3,11 @@ package br.com.easyreminder.data.repository
 import androidx.lifecycle.LiveData
 import br.com.easyreminder.data.local.ReminderDao
 import br.com.easyreminder.model.Reminder
+import javax.inject.Inject
 
-class ReminderRepository(private val reminderDao: ReminderDao) {
+class ReminderRepository @Inject constructor(
+    private val reminderDao: ReminderDao
+) {
 
     val allReminders: LiveData<List<Reminder>> = reminderDao.getAll()
 

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import br.com.easyreminder.databinding.FragmentReminderCreateBinding
 import br.com.easyreminder.model.Reminder
@@ -14,11 +13,14 @@ import br.com.easyreminder.viewmodel.CategoryViewModel
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ReminderCreateFragment : Fragment() {
 
-    private lateinit var reminderViewModel: ReminderViewModel
-    private lateinit var categoryViewModel: CategoryViewModel
+    private val reminderViewModel: ReminderViewModel by viewModels()
+    private val categoryViewModel: CategoryViewModel by viewModels()
 
     private var _binding: FragmentReminderCreateBinding? = null
     private val binding get() = _binding!!
@@ -37,8 +39,6 @@ class ReminderCreateFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        reminderViewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
-        categoryViewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
         binding.editTextTitle.doOnTextChanged { text, _, _, _ ->
             binding.buttonSave.isEnabled = !text.isNullOrBlank()
         }

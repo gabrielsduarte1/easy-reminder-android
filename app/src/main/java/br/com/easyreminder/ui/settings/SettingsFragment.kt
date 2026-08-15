@@ -7,15 +7,17 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.easyreminder.databinding.FragmentSettingsBinding
 import br.com.easyreminder.model.Category
 import br.com.easyreminder.viewmodel.CategoryViewModel
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
-    private lateinit var categoryViewModel: CategoryViewModel
+    private val categoryViewModel: CategoryViewModel by viewModels()
     private lateinit var adapter: CategoryAdapter
 
     private var _binding: FragmentSettingsBinding? = null
@@ -33,7 +35,6 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        categoryViewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
 
         adapter = CategoryAdapter { category ->
             showEditCategoryDialog(category)
