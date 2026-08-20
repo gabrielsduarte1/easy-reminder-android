@@ -3,8 +3,11 @@ package br.com.easyreminder.data.repository
 import androidx.lifecycle.LiveData
 import br.com.easyreminder.data.local.CategoryDao
 import br.com.easyreminder.model.Category
+import javax.inject.Inject
 
-class CategoryRepository(private val categoryDao: CategoryDao) {
+class CategoryRepository @Inject constructor(
+    private val categoryDao: CategoryDao
+) {
 
     val allCategories: LiveData<List<Category>> = categoryDao.getAll()
 
