@@ -1,24 +1,20 @@
 package br.com.easyreminder.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.easyreminder.data.local.AppDatabase
 import br.com.easyreminder.data.repository.CategoryRepository
 import br.com.easyreminder.model.Category
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CategoryViewModel(application: Application) : AndroidViewModel(application) {
-
+@HiltViewModel
+class CategoryViewModel @Inject constructor(
     private val repository: CategoryRepository
-    val allCategories: LiveData<List<Category>>
+) : ViewModel() {
 
-    init {
-        val dao = AppDatabase.getInstance(application).categoryDao()
-        repository = CategoryRepository(dao)
-        allCategories = repository.allCategories
-    }
+    val allCategories: LiveData<List<Category>> = repository.allCategories
 
     fun insert(category: Category) = viewModelScope.launch {
         repository.insert(category)

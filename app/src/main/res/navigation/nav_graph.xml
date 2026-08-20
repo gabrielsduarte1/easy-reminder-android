@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/reminderListFragment">
 
     <fragment
         android:id="@+id/reminderListFragment"
+        tools:layout="@layout/fragment_reminder_list"
         android:name="br.com.easyreminder.ui.reminder.ReminderListFragment"
         android:label="Easy Reminder">
 
@@ -37,11 +39,13 @@
 
     <fragment
         android:id="@+id/reminderCreateFragment"
+        tools:layout="@layout/fragment_reminder_create"
         android:name="br.com.easyreminder.ui.reminder.ReminderCreateFragment"
         android:label="Novo Lembrete" />
 
     <fragment
         android:id="@+id/reminderDetailFragment"
+        tools:layout="@layout/fragment_reminder_detail"
         android:name="br.com.easyreminder.ui.reminder.ReminderDetailFragment"
         android:label="Detalhe">
 
@@ -54,6 +58,7 @@
 
     <fragment
         android:id="@+id/settingsFragment"
+        tools:layout="@layout/fragment_settings"
         android:name="br.com.easyreminder.ui.settings.SettingsFragment"
         android:label="Configurações" />
 

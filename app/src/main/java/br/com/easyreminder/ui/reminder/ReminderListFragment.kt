@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +12,13 @@ import br.com.easyreminder.R
 import br.com.easyreminder.databinding.FragmentReminderListBinding
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ReminderListFragment : Fragment() {
 
-    private lateinit var viewModel: ReminderViewModel
+    private val viewModel: ReminderViewModel by viewModels()
     private lateinit var adapter: ReminderAdapter
 
     private var _binding: FragmentReminderListBinding? = null
@@ -35,7 +37,6 @@ class ReminderListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        viewModel = ViewModelProvider(this)[ReminderViewModel::class.java]
 
         adapter = ReminderAdapter(
             onClick = { item ->
