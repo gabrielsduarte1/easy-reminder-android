@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import br.com.easyreminder.databinding.FragmentReminderCreateBinding
 import br.com.easyreminder.model.Reminder
-import br.com.easyreminder.viewmodel.CategoryViewModel
+import br.com.easyreminder.model.ReminderCategory
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
@@ -20,12 +19,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class ReminderCreateFragment : Fragment() {
 
     private val reminderViewModel: ReminderViewModel by viewModels()
-    private val categoryViewModel: CategoryViewModel by viewModels()
 
     private var _binding: FragmentReminderCreateBinding? = null
     private val binding get() = _binding!!
 
-    private var selectedCategoryId: Int? = null
+    private var selectedCategory: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,13 +84,19 @@ class ReminderCreateFragment : Fragment() {
             datePickerDialog.show()
         }
 
-        categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
-            val names = categories.map { it.name }
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
-            binding.autoCompleteCategory.setAdapter(adapter)
-            binding.autoCompleteCategory.setOnItemClickListener { _, _, position, _ ->
-                selectedCategoryId = categories[position].id
+        binding.chipGroupCategory.removeAllViews()
+        ReminderCategory.values().forEach { category ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = category.displayName
+                chipIcon = androidx.core.content.ContextCompat.getDrawable(requireContext(), category.iconRes)
+                isChipIconVisible = true
+                isCheckable = true
+
+                setOnClickListener {
+                    selectedCategory = if (isChecked) category.name else null
+                }
             }
+            binding.chipGroupCategory.addView(chip)
         }
 
         binding.buttonSave.setOnClickListener {
@@ -109,7 +113,7 @@ class ReminderCreateFragment : Fragment() {
             val reminder = Reminder(
                 title = title,
                 description = description,
-                categoryId = selectedCategoryId,
+                category = selectedCategory,
                 dateTime = binding.editTextDateTime.text.toString().trim().ifEmpty { null }
             )
 

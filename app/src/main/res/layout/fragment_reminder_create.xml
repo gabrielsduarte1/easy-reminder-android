@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -13,9 +14,12 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilTitle"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Título *">
+            android:hint="Título *"
+            app:startIconDrawable="@drawable/ic_edit_24"
+            app:startIconTint="@color/md_theme_outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextTitle"
@@ -27,10 +31,13 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDescription"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Descrição (opcional)">
+            android:hint="Descrição (opcional)"
+            app:startIconDrawable="@drawable/ic_notes_24"
+            app:startIconTint="@color/md_theme_outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextDescription"
@@ -41,28 +48,32 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilCategory"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp"
+            android:text="Categoria"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:hint="Categoria (opcional)">
-
-            <AutoCompleteTextView
-                android:id="@+id/autoCompleteCategory"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+            app:singleSelection="true"
+            app:selectionRequired="false" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDateTime"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Data e hora (opcional)">
+            android:hint="Data e hora (opcional)"
+            app:startIconDrawable="@drawable/ic_calendar_24"
+            app:startIconTint="@color/md_theme_outline">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextDateTime"
@@ -76,6 +87,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSave"
+            style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

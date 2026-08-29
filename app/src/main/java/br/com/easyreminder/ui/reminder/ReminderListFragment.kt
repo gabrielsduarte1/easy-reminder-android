@@ -41,11 +41,11 @@ class ReminderListFragment : Fragment() {
         adapter = ReminderAdapter(
             onClick = { item ->
                 val action = ReminderListFragmentDirections
-                    .actionListToDetail(item.reminder.id)
+                    .actionListToDetail(item.id)
                 findNavController().navigate(action)
             },
             onLongClick = { item ->
-                showContextMenu(item.reminder)
+                showContextMenu(item)
             }
         )
 
@@ -56,7 +56,7 @@ class ReminderListFragment : Fragment() {
             findNavController().navigate(R.id.action_list_to_create)
         }
 
-        viewModel.remindersWithCategory.observe(viewLifecycleOwner) { items ->
+        viewModel.allReminders.observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
             if (items.isEmpty()) {
                 binding.recyclerViewReminders.visibility = View.GONE
@@ -155,8 +155,7 @@ class ReminderListFragment : Fragment() {
                     direction: Int
                 ) {
                     val position = viewHolder.adapterPosition
-                    val item = adapter.currentList[position]
-                    val reminder = item.reminder
+                    val reminder = adapter.currentList[position]
 
                     if (direction == androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
                         viewModel.delete(reminder)
@@ -171,8 +170,8 @@ class ReminderListFragment : Fragment() {
                             ReminderScheduler.schedule(requireContext(), reminder)
                         }.show()
                     } else {
-                    toggleCompleted(reminder)
-                }
+                        toggleCompleted(reminder)
+                    }
                 }
 
                 override fun onChildDraw(

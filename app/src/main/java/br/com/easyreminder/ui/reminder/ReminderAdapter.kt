@@ -3,25 +3,25 @@ package br.com.easyreminder.ui.reminder
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.easyreminder.databinding.ItemReminderBinding
-import br.com.easyreminder.model.ReminderWithCategory
+import br.com.easyreminder.model.Reminder
+import br.com.easyreminder.model.ReminderCategory
 
 class ReminderAdapter(
-    private val onClick: (ReminderWithCategory) -> Unit,
-    private val onLongClick: (ReminderWithCategory) -> Unit
-) : ListAdapter<ReminderWithCategory, ReminderAdapter.ReminderViewHolder>(DiffCallback) {
+    private val onClick: (Reminder) -> Unit,
+    private val onLongClick: (Reminder) -> Unit
+) : ListAdapter<Reminder, ReminderAdapter.ReminderViewHolder>(DiffCallback) {
 
-    companion object DiffCallback : DiffUtil.ItemCallback<ReminderWithCategory>() {
-        override fun areItemsTheSame(oldItem: ReminderWithCategory, newItem: ReminderWithCategory): Boolean {
-            return oldItem.reminder.id == newItem.reminder.id
+    companion object DiffCallback : DiffUtil.ItemCallback<Reminder>() {
+        override fun areItemsTheSame(oldItem: Reminder, newItem: Reminder): Boolean {
+            return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: ReminderWithCategory, newItem: ReminderWithCategory): Boolean {
+        override fun areContentsTheSame(oldItem: Reminder, newItem: Reminder): Boolean {
             return oldItem == newItem
         }
     }
@@ -37,12 +37,19 @@ class ReminderAdapter(
 
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val item = getItem(position)
-        holder.binding.textViewTitle.text = item.reminder.title
-        holder.binding.textViewDescription.text = item.reminder.description
+        holder.binding.textViewTitle.text = item.title
+        holder.binding.textViewDescription.text = item.description
 
-        val categoryColor = item.category?.color ?: "#CCCCCC"
+        val category = item.category?.let {
+            try {
+                ReminderCategory.valueOf(it)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
+        val categoryColor = category?.colorHex ?: "#CCCCCC"
 
-        if (item.reminder.isCompleted) {
+        if (item.isCompleted) {
             holder.binding.viewCategoryColor.setBackgroundColor(Color.parseColor("#4CAF50"))
             holder.binding.textViewTitle.paintFlags =
                 holder.binding.textViewTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -56,7 +63,7 @@ class ReminderAdapter(
             holder.itemView.alpha = 1.0f
         }
 
-        holder.binding.textViewCategory.text = item.category?.name ?: "Sem categoria"
+        holder.binding.textViewCategory.text = category?.displayName ?: "Sem categoria"
         holder.binding.textViewCategory.setTextColor(Color.parseColor(categoryColor))
 
         val bgColor = Color.parseColor(categoryColor)
@@ -67,9 +74,9 @@ class ReminderAdapter(
         background.alpha = 51
         holder.binding.textViewCategory.background = background
 
-        if (item.reminder.dateTime != null) {
+        if (item.dateTime != null) {
             holder.binding.textViewDateTime.visibility = android.view.View.VISIBLE
-            holder.binding.textViewDateTime.text = "🕐 ${item.reminder.dateTime}"
+            holder.binding.textViewDateTime.text = "🕐 ${item.dateTime}"
         } else {
             holder.binding.textViewDateTime.visibility = android.view.View.GONE
         }

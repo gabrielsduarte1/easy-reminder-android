@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import br.com.easyreminder.databinding.FragmentReminderDetailBinding
 import br.com.easyreminder.model.Reminder
-import br.com.easyreminder.viewmodel.CategoryViewModel
+import br.com.easyreminder.model.ReminderCategory
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.fragment.app.viewModels
@@ -19,9 +18,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class ReminderDetailFragment : Fragment() {
 
     private val reminderViewModel: ReminderViewModel by viewModels()
-    private val categoryViewModel: CategoryViewModel by viewModels()
     private var reminderId: Int = -1
     private var currentReminder: Reminder? = null
+    private var selectedCategory: String? = null
 
     private var _binding: FragmentReminderDetailBinding? = null
     private val binding get() = _binding!!
@@ -43,26 +42,35 @@ class ReminderDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.chipGroupCategory.removeAllViews()
+        ReminderCategory.values().forEach { category ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = category.displayName
+                chipIcon = androidx.core.content.ContextCompat.getDrawable(requireContext(), category.iconRes)
+                isChipIconVisible = true
+                isCheckable = true
+                isChecked = category.name == selectedCategory
 
-        var selectedCategoryId: Int? = null
-
-        categoryViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
-            val categoryNames = categories.map { it.name }
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categoryNames)
-            binding.autoCompleteCategory.setAdapter(adapter)
-
-            binding.autoCompleteCategory.setOnItemClickListener { _, _, position, _ ->
-                selectedCategoryId = categories[position].id
+                setOnClickListener {
+                    selectedCategory = if (isChecked) category.name else null
+                }
             }
+            binding.chipGroupCategory.addView(chip)
         }
 
-        reminderViewModel.remindersWithCategory.observe(viewLifecycleOwner) { items ->
-            val item = items.find { it.reminder.id == reminderId }
+        reminderViewModel.allReminders.observe(viewLifecycleOwner) { reminders ->
+            val item = reminders.find { it.id == reminderId }
             item?.let {
-                currentReminder = it.reminder
-                binding.editTextTitle.setText(it.reminder.title)
-                binding.editTextDescription.setText(it.reminder.description)
-                selectedCategoryId = it.reminder.categoryId
+                currentReminder = it
+                binding.editTextTitle.setText(it.title)
+                binding.editTextDescription.setText(it.description)
+                selectedCategory = it.category
+
+                for (i in 0 until binding.chipGroupCategory.childCount) {
+                    val chip = binding.chipGroupCategory.getChildAt(i) as com.google.android.material.chip.Chip
+                    chip.isChecked = chip.text == ReminderCategory.values()
+                        .find { cat -> cat.name == it.category }?.displayName
+                }
             }
         }
 
@@ -79,7 +87,7 @@ class ReminderDetailFragment : Fragment() {
             val updated = currentReminder?.copy(
                 title = title,
                 description = binding.editTextDescription.text.toString().trim(),
-                categoryId = selectedCategoryId
+                category = selectedCategory
             )
 
             updated?.let {
