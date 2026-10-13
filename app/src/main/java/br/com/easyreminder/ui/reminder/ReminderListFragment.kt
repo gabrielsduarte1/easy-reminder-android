@@ -1,5 +1,6 @@
 package br.com.easyreminder.ui.reminder
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import br.com.easyreminder.databinding.FragmentReminderListBinding
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -86,7 +88,7 @@ class ReminderListFragment : Fragment() {
 
     private fun showContextMenu(reminder: br.com.easyreminder.model.Reminder) {
         val options = arrayOf("Editar", "Excluir")
-        android.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle(reminder.title)
             .setItems(options) { _, which ->
                 when (which) {
@@ -102,7 +104,7 @@ class ReminderListFragment : Fragment() {
     }
 
     private fun confirmDelete(reminder: br.com.easyreminder.model.Reminder) {
-        android.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle("Excluir lembrete")
             .setMessage("Deseja excluir \"${reminder.title}\"?")
             .setPositiveButton("Excluir") { _, _ ->
@@ -139,10 +141,10 @@ class ReminderListFragment : Fragment() {
     }
 
     private fun setupSwipeGestures() {
-        val itemTouchHelper = androidx.recyclerview.widget.ItemTouchHelper(
-            object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(
+        val itemTouchHelper = ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(
                 0,
-                androidx.recyclerview.widget.ItemTouchHelper.LEFT or androidx.recyclerview.widget.ItemTouchHelper.RIGHT
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
             ) {
                 override fun onMove(
                     recyclerView: RecyclerView,
@@ -157,7 +159,7 @@ class ReminderListFragment : Fragment() {
                     val position = viewHolder.adapterPosition
                     val reminder = adapter.currentList[position]
 
-                    if (direction == androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
+                    if (direction == ItemTouchHelper.LEFT) {
                         viewModel.delete(reminder)
                         ReminderScheduler.cancel(requireContext(), reminder.id)
 

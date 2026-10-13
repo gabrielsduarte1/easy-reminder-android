@@ -12,6 +12,7 @@ import br.com.easyreminder.model.ReminderCategory
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.fragment.app.viewModels
+import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -44,7 +45,7 @@ class ReminderDetailFragment : Fragment() {
 
         binding.chipGroupCategory.removeAllViews()
         ReminderCategory.values().forEach { category ->
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+            val chip = Chip(requireContext()).apply {
                 text = category.displayName
                 chipIcon = androidx.core.content.ContextCompat.getDrawable(requireContext(), category.iconRes)
                 isChipIconVisible = true
@@ -67,7 +68,7 @@ class ReminderDetailFragment : Fragment() {
                 selectedCategory = it.category
 
                 for (i in 0 until binding.chipGroupCategory.childCount) {
-                    val chip = binding.chipGroupCategory.getChildAt(i) as com.google.android.material.chip.Chip
+                    val chip = binding.chipGroupCategory.getChildAt(i) as Chip
                     chip.isChecked = chip.text == ReminderCategory.values()
                         .find { cat -> cat.name == it.category }?.displayName
                 }

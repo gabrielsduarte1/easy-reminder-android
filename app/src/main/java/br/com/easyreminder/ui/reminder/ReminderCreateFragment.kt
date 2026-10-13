@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import br.com.easyreminder.databinding.FragmentReminderCreateBinding
@@ -13,7 +14,9 @@ import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
+import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Calendar
 
 @AndroidEntryPoint
 class ReminderCreateFragment : Fragment() {
@@ -42,7 +45,7 @@ class ReminderCreateFragment : Fragment() {
         }
 
         binding.editTextDateTime.setOnClickListener {
-            val calendar = java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
 
             val datePickerDialog = android.app.DatePickerDialog(
                 requireContext(),
@@ -50,11 +53,11 @@ class ReminderCreateFragment : Fragment() {
                     android.app.TimePickerDialog(
                         requireContext(),
                         { _, hour, minute ->
-                            val selectedDateTime = java.util.Calendar.getInstance().apply {
+                            val selectedDateTime = Calendar.getInstance().apply {
                                 set(year, month, day, hour, minute, 0)
                             }
 
-                            if (selectedDateTime.before(java.util.Calendar.getInstance())) {
+                            if (selectedDateTime.before(Calendar.getInstance())) {
                                 android.widget.Toast.makeText(
                                     requireContext(),
                                     "Escolha um horário que ainda não passou",
@@ -69,14 +72,14 @@ class ReminderCreateFragment : Fragment() {
                             )
                             binding.editTextDateTime.setText(dateTime)
                         },
-                        calendar.get(java.util.Calendar.HOUR_OF_DAY),
-                        calendar.get(java.util.Calendar.MINUTE),
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
                         true
                     ).show()
                 },
-                calendar.get(java.util.Calendar.YEAR),
-                calendar.get(java.util.Calendar.MONTH),
-                calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
             )
 
             datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
@@ -86,9 +89,9 @@ class ReminderCreateFragment : Fragment() {
 
         binding.chipGroupCategory.removeAllViews()
         ReminderCategory.values().forEach { category ->
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+            val chip = Chip(requireContext()).apply {
                 text = category.displayName
-                chipIcon = androidx.core.content.ContextCompat.getDrawable(requireContext(), category.iconRes)
+                chipIcon = ContextCompat.getDrawable(requireContext(), category.iconRes)
                 isChipIconVisible = true
                 isCheckable = true
 
@@ -102,13 +105,6 @@ class ReminderCreateFragment : Fragment() {
         binding.buttonSave.setOnClickListener {
             val title = binding.editTextTitle.text.toString().trim()
             val description = binding.editTextDescription.text.toString().trim()
-
-            if (title.isEmpty()) {
-                binding.tilTitle.error = "O título é obrigatório"
-                return@setOnClickListener
-            }
-
-            binding.tilTitle.error = null
 
             val reminder = Reminder(
                 title = title,
