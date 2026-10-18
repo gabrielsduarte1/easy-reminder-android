@@ -70,6 +70,25 @@ class ReminderListFragment : Fragment() {
         }
 
         setupSwipeGestures()
+
+        childFragmentManager.setFragmentResultListener(
+            ReminderOptionsDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            val reminderId = result.getInt(ReminderOptionsDialogFragment.RESULT_REMINDER_ID)
+
+            when (result.getString(ReminderOptionsDialogFragment.RESULT_ACTION)) {
+                ReminderOptionsDialogFragment.ACTION_EDIT -> {
+                    val action = ReminderListFragmentDirections.actionListToDetail(reminderId)
+                    findNavController().navigate(action)
+                }
+                ReminderOptionsDialogFragment.ACTION_DELETE -> {
+                    val reminder = adapter.currentList.firstOrNull { it.id == reminderId }
+                    reminder?.let { confirmDelete(it) }
+                }
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu, inflater: android.view.MenuInflater) {
@@ -87,20 +106,9 @@ class ReminderListFragment : Fragment() {
     }
 
     private fun showContextMenu(reminder: br.com.easyreminder.model.Reminder) {
-        val options = arrayOf("Editar", "Excluir")
-        AlertDialog.Builder(requireContext())
-            .setTitle(reminder.title)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> {
-                        val action = ReminderListFragmentDirections
-                            .actionListToDetail(reminder.id)
-                        findNavController().navigate(action)
-                    }
-                    1 -> confirmDelete(reminder)
-                }
-            }
-            .show()
+        ReminderOptionsDialogFragment
+            .newInstance(reminder.title, reminder.id)
+            .show(childFragmentManager, ReminderOptionsDialogFragment.TAG)
     }
 
     private fun confirmDelete(reminder: br.com.easyreminder.model.Reminder) {
