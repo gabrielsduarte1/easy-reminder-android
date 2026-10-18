@@ -25,14 +25,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📝"
+            android:text="@string/empty_illustration"
             android:textSize="64sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Nenhum lembrete ainda"
+            android:text="@string/empty_title"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="?attr/colorPrimary" />
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Toque no + para criar seu primeiro lembrete!"
+            android:text="@string/empty_message"
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"
             android:gravity="center" />
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="Novo Lembrete"
+        android:contentDescription="@string/cd_add_reminder"
         app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

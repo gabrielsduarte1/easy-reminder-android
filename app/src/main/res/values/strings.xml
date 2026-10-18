@@ -1,3 +1,47 @@
 <resources>
     <string name="app_name">Easy Reminder</string>
+
+    <!-- Títulos de tela -->
+    <string name="title_create_reminder">Novo Lembrete</string>
+    <string name="title_settings">Configurações</string>
+
+    <!-- Ações -->
+    <string name="action_save_reminder">Salvar lembrete</string>
+    <string name="action_save_changes">Salvar alterações</string>
+    <string name="action_delete_reminder">Excluir lembrete</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_undo">DESFAZER</string>
+
+    <!-- Formulário -->
+    <string name="hint_title">Título *</string>
+    <string name="hint_description">Descrição (opcional)</string>
+    <string name="hint_date_time">Data e hora (opcional)</string>
+    <string name="label_category">Categoria</string>
+    <string name="category_none">Sem categoria</string>
+
+    <!-- Lista vazia -->
+    <string name="empty_illustration">📝</string>
+    <string name="empty_title">Nenhum lembrete ainda</string>
+    <string name="empty_message">Toque no + para criar seu primeiro lembrete!</string>
+
+    <!-- Configurações -->
+    <string name="settings_section_appearance">APARÊNCIA</string>
+    <string name="settings_dark_theme_title">Tema escuro</string>
+    <string name="settings_dark_theme_subtitle">Alterna entre claro e escuro</string>
+
+    <!-- Mensagens -->
+    <string name="confirm_delete_title">Excluir lembrete</string>
+    <string name="confirm_delete_message">Deseja excluir \"%1$s\"?</string>
+    <string name="message_past_time">Escolha um horário que ainda não passou</string>
+    <string name="message_reminder_deleted">Lembrete excluído</string>
+    <string name="message_reminder_completed">Lembrete concluído</string>
+    <string name="message_reminder_pending">Lembrete pendente novamente</string>
+
+    <!-- Acessibilidade -->
+    <string name="cd_add_reminder">Novo lembrete</string>
+
+    <!-- Formatação -->
+    <string name="format_date_time">🕐 %1$s</string>
 </resources>
