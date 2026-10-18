@@ -14,6 +14,7 @@ import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
+import br.com.easyreminder.util.showToast
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
@@ -69,11 +70,7 @@ class ReminderCreateFragment : Fragment() {
                             }
 
                             if (selectedDateTime.before(Calendar.getInstance())) {
-                                android.widget.Toast.makeText(
-                                    requireContext(),
-                                    "Escolha um horário que ainda não passou",
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
+                                requireContext().showToast("Escolha um horário que ainda não passou")
                                 return@TimePickerDialog
                             }
 
