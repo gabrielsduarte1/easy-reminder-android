@@ -6,9 +6,9 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import br.com.easyreminder.R
 
 class SwipeToActionCallback(
     context: Context,
@@ -20,8 +20,8 @@ class SwipeToActionCallback(
 ) {
 
     private val paint = Paint()
-    private val deleteColor = "#E24B4A".toColorInt()
-    private val completeColor = "#4CAF50".toColorInt()
+    private val deleteColor = ContextCompat.getColor(context, R.color.swipe_delete)
+    private val completeColor = ContextCompat.getColor(context, R.color.swipe_complete)
 
     private val deleteIcon: Drawable? =
         ContextCompat.getDrawable(context, android.R.drawable.ic_menu_delete)

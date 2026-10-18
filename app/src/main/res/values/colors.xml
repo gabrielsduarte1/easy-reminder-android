@@ -50,4 +50,12 @@
     <color name="md_theme_surfaceContainer">#EDEEEB</color>
     <color name="md_theme_surfaceContainerHigh">#E7E8E5</color>
     <color name="md_theme_surfaceContainerHighest">#E2E3DF</color>
+
+    <!-- Ações de swipe -->
+    <color name="swipe_delete">#E24B4A</color>
+    <color name="swipe_complete">#4CAF50</color>
+
+    <!-- Estados do lembrete -->
+    <color name="reminder_completed">#9E9E9E</color>
+    <color name="category_default">#CCCCCC</color>
 </resources>
