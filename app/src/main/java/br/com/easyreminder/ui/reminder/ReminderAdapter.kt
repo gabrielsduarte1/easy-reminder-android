@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -50,13 +51,13 @@ class ReminderAdapter(
         val categoryColor = category?.colorHex ?: "#CCCCCC"
 
         if (item.isCompleted) {
-            holder.binding.viewCategoryColor.setBackgroundColor(Color.parseColor("#4CAF50"))
+            holder.binding.viewCategoryColor.setBackgroundColor("#4CAF50".toColorInt())
             holder.binding.textViewTitle.paintFlags =
                 holder.binding.textViewTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            holder.binding.textViewTitle.setTextColor(Color.parseColor("#9E9E9E"))
+            holder.binding.textViewTitle.setTextColor("#9E9E9E".toColorInt())
             holder.itemView.alpha = 0.6f
         } else {
-            holder.binding.viewCategoryColor.setBackgroundColor(Color.parseColor(categoryColor))
+            holder.binding.viewCategoryColor.setBackgroundColor(categoryColor.toColorInt())
             holder.binding.textViewTitle.paintFlags =
                 holder.binding.textViewTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             holder.binding.textViewTitle.setTextColor(Color.BLACK)
@@ -64,9 +65,9 @@ class ReminderAdapter(
         }
 
         holder.binding.textViewCategory.text = category?.displayName ?: "Sem categoria"
-        holder.binding.textViewCategory.setTextColor(Color.parseColor(categoryColor))
+        holder.binding.textViewCategory.setTextColor(categoryColor.toColorInt())
 
-        val bgColor = Color.parseColor(categoryColor)
+        val bgColor = categoryColor.toColorInt()
         val background = android.graphics.drawable.GradientDrawable()
         background.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
         background.cornerRadius = 32f

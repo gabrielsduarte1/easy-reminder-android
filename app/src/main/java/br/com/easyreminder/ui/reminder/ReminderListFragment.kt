@@ -3,18 +3,24 @@ package br.com.easyreminder.ui.reminder
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import br.com.easyreminder.R
 import br.com.easyreminder.databinding.FragmentReminderListBinding
+import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.ItemTouchHelper
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,8 +43,23 @@ class ReminderListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
 
+        requireActivity().addMenuProvider(object : MenuProvider {
+
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_main, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.settingsFragment -> {
+                        findNavController().navigate(R.id.action_list_to_settings)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         adapter = ReminderAdapter(
             onClick = { item ->
@@ -88,30 +109,25 @@ class ReminderListFragment : Fragment() {
                 }
             }
         }
-
     }
 
-    override fun onCreateOptionsMenu(menu: android.view.Menu, inflater: android.view.MenuInflater) {
-        inflater.inflate(R.menu.menu_main, menu)
+    private fun setupSwipeGestures() {
+        val callback = SwipeToActionCallback(
+            context = requireContext(),
+            onSwipeLeft = { position -> deleteWithUndo(adapter.currentList[position]) },
+            onSwipeRight = { position -> toggleCompleted(adapter.currentList[position]) }
+        )
+
+        ItemTouchHelper(callback).attachToRecyclerView(binding.recyclerViewReminders)
     }
 
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.settingsFragment -> {
-                findNavController().navigate(R.id.action_list_to_settings)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun showContextMenu(reminder: br.com.easyreminder.model.Reminder) {
+    private fun showContextMenu(reminder: Reminder) {
         ReminderOptionsDialogFragment
             .newInstance(reminder.title, reminder.id)
             .show(childFragmentManager, ReminderOptionsDialogFragment.TAG)
     }
 
-    private fun confirmDelete(reminder: br.com.easyreminder.model.Reminder) {
+    private fun confirmDelete(reminder: Reminder) {
         AlertDialog.Builder(requireContext())
             .setTitle("Excluir lembrete")
             .setMessage("Deseja excluir \"${reminder.title}\"?")
@@ -122,7 +138,21 @@ class ReminderListFragment : Fragment() {
             .show()
     }
 
-    private fun toggleCompleted(reminder: br.com.easyreminder.model.Reminder) {
+    private fun deleteWithUndo(reminder: Reminder) {
+        viewModel.delete(reminder)
+        ReminderScheduler.cancel(requireContext(), reminder.id)
+
+        Snackbar.make(
+            requireView(),
+            "Lembrete excluído",
+            Snackbar.LENGTH_LONG
+        ).setAction("DESFAZER") {
+            viewModel.insert(reminder)
+            ReminderScheduler.schedule(requireContext(), reminder)
+        }.show()
+    }
+
+    private fun toggleCompleted(reminder: Reminder) {
         val updated = reminder.copy(isCompleted = !reminder.isCompleted)
         viewModel.update(updated)
 
@@ -134,10 +164,10 @@ class ReminderListFragment : Fragment() {
 
         val message = if (updated.isCompleted) "Lembrete concluído" else "Lembrete pendente novamente"
 
-        com.google.android.material.snackbar.Snackbar.make(
+        Snackbar.make(
             requireView(),
             message,
-            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG
         ).setAction("DESFAZER") {
             viewModel.update(reminder)
             if (reminder.isCompleted) {
@@ -146,106 +176,6 @@ class ReminderListFragment : Fragment() {
                 ReminderScheduler.schedule(requireContext(), reminder)
             }
         }.show()
-    }
-
-    private fun setupSwipeGestures() {
-        val itemTouchHelper = ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-            ) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean = false
-
-                override fun onSwiped(
-                    viewHolder: RecyclerView.ViewHolder,
-                    direction: Int
-                ) {
-                    val position = viewHolder.adapterPosition
-                    val reminder = adapter.currentList[position]
-
-                    if (direction == ItemTouchHelper.LEFT) {
-                        viewModel.delete(reminder)
-                        ReminderScheduler.cancel(requireContext(), reminder.id)
-
-                        com.google.android.material.snackbar.Snackbar.make(
-                            requireView(),
-                            "Lembrete excluído",
-                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                        ).setAction("DESFAZER") {
-                            viewModel.insert(reminder)
-                            ReminderScheduler.schedule(requireContext(), reminder)
-                        }.show()
-                    } else {
-                        toggleCompleted(reminder)
-                    }
-                }
-
-                override fun onChildDraw(
-                    canvas: android.graphics.Canvas,
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    dX: Float, dY: Float,
-                    actionState: Int,
-                    isCurrentlyActive: Boolean
-                ) {
-                    val itemView = viewHolder.itemView
-                    val paint = android.graphics.Paint()
-
-                    if (dX < 0) {
-                        paint.color = android.graphics.Color.parseColor("#E24B4A")
-                        canvas.drawRect(
-                            itemView.right + dX,
-                            itemView.top.toFloat(),
-                            itemView.right.toFloat(),
-                            itemView.bottom.toFloat(),
-                            paint
-                        )
-                        val icon = androidx.core.content.ContextCompat.getDrawable(
-                            requireContext(),
-                            android.R.drawable.ic_menu_delete
-                        )
-                        icon?.let {
-                            val iconMargin = (itemView.height - it.intrinsicHeight) / 2
-                            val iconTop = itemView.top + iconMargin
-                            val iconBottom = iconTop + it.intrinsicHeight
-                            val iconLeft = itemView.right - iconMargin - it.intrinsicWidth
-                            val iconRight = itemView.right - iconMargin
-                            it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                            it.draw(canvas)
-                        }
-                    } else if (dX > 0) {
-                        paint.color = android.graphics.Color.parseColor("#4CAF50")
-                        canvas.drawRect(
-                            itemView.left.toFloat(),
-                            itemView.top.toFloat(),
-                            itemView.left + dX,
-                            itemView.bottom.toFloat(),
-                            paint
-                        )
-                        val icon = androidx.core.content.ContextCompat.getDrawable(
-                            requireContext(),
-                            android.R.drawable.checkbox_on_background
-                        )
-                        icon?.let {
-                            val iconMargin = (itemView.height - it.intrinsicHeight) / 2
-                            val iconTop = itemView.top + iconMargin
-                            val iconBottom = iconTop + it.intrinsicHeight
-                            val iconLeft = itemView.left + iconMargin
-                            val iconRight = iconLeft + it.intrinsicWidth
-                            it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                            it.draw(canvas)
-                        }
-                    }
-
-                    super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                }
-            }
-        )
-        itemTouchHelper.attachToRecyclerView(binding.recyclerViewReminders)
     }
 
     override fun onDestroyView() {

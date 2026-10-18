@@ -80,7 +80,7 @@ class ReminderCreateFragment : Fragment() {
         }
 
         binding.chipGroupCategory.removeAllViews()
-        ReminderCategory.values().forEach { category ->
+        ReminderCategory.entries.forEach { category ->
             val chip = Chip(requireContext()).apply {
                 text = category.displayName
                 tag = category.name
