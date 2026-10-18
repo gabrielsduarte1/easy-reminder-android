@@ -14,6 +14,8 @@ import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
+import br.com.easyreminder.util.showDatePicker
+import br.com.easyreminder.util.showTimePicker
 import br.com.easyreminder.util.showToast
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,42 +59,24 @@ class ReminderCreateFragment : Fragment() {
         }
 
         binding.editTextDateTime.setOnClickListener {
-            val calendar = Calendar.getInstance()
+            requireContext().showDatePicker { year, month, day ->
+                requireContext().showTimePicker { hour, minute ->
+                    val selectedDateTime = Calendar.getInstance().apply {
+                        set(year, month, day, hour, minute, 0)
+                    }
 
-            val datePickerDialog = android.app.DatePickerDialog(
-                requireContext(),
-                { _, year, month, day ->
-                    android.app.TimePickerDialog(
-                        requireContext(),
-                        { _, hour, minute ->
-                            val selectedDateTime = Calendar.getInstance().apply {
-                                set(year, month, day, hour, minute, 0)
-                            }
+                    if (selectedDateTime.before(Calendar.getInstance())) {
+                        requireContext().showToast("Escolha um horário que ainda não passou")
+                        return@showTimePicker
+                    }
 
-                            if (selectedDateTime.before(Calendar.getInstance())) {
-                                requireContext().showToast("Escolha um horário que ainda não passou")
-                                return@TimePickerDialog
-                            }
-
-                            val dateTime = String.format(
-                                "%02d/%02d/%04d %02d:%02d",
-                                day, month + 1, year, hour, minute
-                            )
-                            binding.editTextDateTime.setText(dateTime)
-                        },
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE),
-                        true
-                    ).show()
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-
-            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
-
-            datePickerDialog.show()
+                    val dateTime = String.format(
+                        "%02d/%02d/%04d %02d:%02d",
+                        day, month + 1, year, hour, minute
+                    )
+                    binding.editTextDateTime.setText(dateTime)
+                }
+            }
         }
 
         binding.chipGroupCategory.removeAllViews()
