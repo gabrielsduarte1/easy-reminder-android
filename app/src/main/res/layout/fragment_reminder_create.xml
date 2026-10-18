@@ -95,6 +95,17 @@
             android:textAllCaps="false"
             android:enabled="false"/>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonDelete"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Excluir lembrete"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorError"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </ScrollView>

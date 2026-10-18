@@ -21,7 +21,7 @@
 
         <action
             android:id="@+id/action_list_to_detail"
-            app:destination="@id/reminderDetailFragment"
+            app:destination="@id/reminderCreateFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -41,7 +41,14 @@
         android:id="@+id/reminderCreateFragment"
         tools:layout="@layout/fragment_reminder_create"
         android:name="br.com.easyreminder.ui.reminder.ReminderCreateFragment"
-        android:label="Novo Lembrete" />
+        android:label="Novo Lembrete">
+
+        <argument
+            android:name="reminderId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/reminderDetailFragment"
