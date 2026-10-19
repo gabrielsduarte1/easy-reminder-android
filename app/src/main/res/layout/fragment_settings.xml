@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_section_appearance"
+            android:text="APARÊNCIA"
             android:textSize="12sp"
             android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
@@ -43,14 +43,15 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/settings_dark_theme_title"
+                        android:text="Tema escuro"
                         android:textSize="14sp"
                         android:textColor="@android:color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/settings_dark_theme_subtitle"                        android:textSize="12sp"
+                        android:text="Alterna entre claro e escuro"
+                        android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
                 </LinearLayout>

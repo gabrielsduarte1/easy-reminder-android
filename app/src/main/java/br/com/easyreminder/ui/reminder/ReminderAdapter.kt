@@ -4,12 +4,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import br.com.easyreminder.R
 import br.com.easyreminder.databinding.ItemReminderBinding
 import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.model.ReminderCategory
@@ -40,8 +37,6 @@ class ReminderAdapter(
 
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val item = getItem(position)
-        val context = holder.itemView.context
-
         holder.binding.textViewTitle.text = item.title
         holder.binding.textViewDescription.text = item.description
 
@@ -52,22 +47,16 @@ class ReminderAdapter(
                 null
             }
         }
-
-        val categoryColor = category?.colorHex?.toColorInt()
-            ?: ContextCompat.getColor(context, R.color.category_default)
+        val categoryColor = category?.colorHex ?: "#CCCCCC"
 
         if (item.isCompleted) {
-            holder.binding.viewCategoryColor.setBackgroundColor(
-                ContextCompat.getColor(context, R.color.swipe_complete)
-            )
+            holder.binding.viewCategoryColor.setBackgroundColor(Color.parseColor("#4CAF50"))
             holder.binding.textViewTitle.paintFlags =
                 holder.binding.textViewTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            holder.binding.textViewTitle.setTextColor(
-                ContextCompat.getColor(context, R.color.reminder_completed)
-            )
+            holder.binding.textViewTitle.setTextColor(Color.parseColor("#9E9E9E"))
             holder.itemView.alpha = 0.6f
         } else {
-            holder.binding.viewCategoryColor.setBackgroundColor(categoryColor)
+            holder.binding.viewCategoryColor.setBackgroundColor(Color.parseColor(categoryColor))
             holder.binding.textViewTitle.paintFlags =
                 holder.binding.textViewTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             holder.binding.textViewTitle.setTextColor(Color.BLACK)
@@ -75,12 +64,13 @@ class ReminderAdapter(
         }
 
         holder.binding.textViewCategory.text = category?.displayName ?: "Sem categoria"
-        holder.binding.textViewCategory.setTextColor(categoryColor)
+        holder.binding.textViewCategory.setTextColor(Color.parseColor(categoryColor))
 
+        val bgColor = Color.parseColor(categoryColor)
         val background = android.graphics.drawable.GradientDrawable()
         background.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
         background.cornerRadius = 32f
-        background.setColor(categoryColor)
+        background.setColor(bgColor)
         background.alpha = 51
         holder.binding.textViewCategory.background = background
 
