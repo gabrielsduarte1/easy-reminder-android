@@ -1,9 +1,11 @@
 package br.com.easyreminder.ui.reminder
 
 import android.graphics.Paint
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -79,18 +81,16 @@ class ReminderAdapter(
             ?: context.getString(R.string.category_none)
         holder.binding.textViewCategory.setTextColor(categoryColor)
 
-        val background = android.graphics.drawable.GradientDrawable()
-        background.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-        background.cornerRadius = 32f
-        background.setColor(categoryColor)
-        background.alpha = 51
-        holder.binding.textViewCategory.background = background
+        holder.binding.textViewCategory.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 32f
+            setColor(categoryColor)
+            alpha = 51
+        }
 
+        holder.binding.textViewDateTime.isVisible = item.dateTime != null
         if (item.dateTime != null) {
-            holder.binding.textViewDateTime.visibility = android.view.View.VISIBLE
             holder.binding.textViewDateTime.text = context.getString(R.string.format_date_time, item.dateTime)
-        } else {
-            holder.binding.textViewDateTime.visibility = android.view.View.GONE
         }
 
         holder.itemView.setOnClickListener { onClick(item) }
