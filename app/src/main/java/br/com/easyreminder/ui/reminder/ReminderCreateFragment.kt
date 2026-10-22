@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import br.com.easyreminder.databinding.FragmentReminderCreateBinding
@@ -13,7 +14,12 @@ import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
+import br.com.easyreminder.util.showDatePicker
+import br.com.easyreminder.util.showTimePicker
+import br.com.easyreminder.util.showToast
+import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Calendar
 
 @AndroidEntryPoint
 class ReminderCreateFragment : Fragment() {
@@ -23,7 +29,18 @@ class ReminderCreateFragment : Fragment() {
     private var _binding: FragmentReminderCreateBinding? = null
     private val binding get() = _binding!!
 
+    private var reminderId: Int = -1
+    private var currentReminder: Reminder? = null
     private var selectedCategory: String? = null
+    private var prefilled = false
+
+    private val isEditing: Boolean
+        get() = reminderId != -1
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        reminderId = arguments?.getInt("reminderId") ?: -1
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,53 +59,32 @@ class ReminderCreateFragment : Fragment() {
         }
 
         binding.editTextDateTime.setOnClickListener {
-            val calendar = java.util.Calendar.getInstance()
+            requireContext().showDatePicker { year, month, day ->
+                requireContext().showTimePicker { hour, minute ->
+                    val selectedDateTime = Calendar.getInstance().apply {
+                        set(year, month, day, hour, minute, 0)
+                    }
 
-            val datePickerDialog = android.app.DatePickerDialog(
-                requireContext(),
-                { _, year, month, day ->
-                    android.app.TimePickerDialog(
-                        requireContext(),
-                        { _, hour, minute ->
-                            val selectedDateTime = java.util.Calendar.getInstance().apply {
-                                set(year, month, day, hour, minute, 0)
-                            }
+                    if (selectedDateTime.before(Calendar.getInstance())) {
+                        requireContext().showToast("Escolha um horário que ainda não passou")
+                        return@showTimePicker
+                    }
 
-                            if (selectedDateTime.before(java.util.Calendar.getInstance())) {
-                                android.widget.Toast.makeText(
-                                    requireContext(),
-                                    "Escolha um horário que ainda não passou",
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                                return@TimePickerDialog
-                            }
-
-                            val dateTime = String.format(
-                                "%02d/%02d/%04d %02d:%02d",
-                                day, month + 1, year, hour, minute
-                            )
-                            binding.editTextDateTime.setText(dateTime)
-                        },
-                        calendar.get(java.util.Calendar.HOUR_OF_DAY),
-                        calendar.get(java.util.Calendar.MINUTE),
-                        true
-                    ).show()
-                },
-                calendar.get(java.util.Calendar.YEAR),
-                calendar.get(java.util.Calendar.MONTH),
-                calendar.get(java.util.Calendar.DAY_OF_MONTH)
-            )
-
-            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
-
-            datePickerDialog.show()
+                    val dateTime = String.format(
+                        "%02d/%02d/%04d %02d:%02d",
+                        day, month + 1, year, hour, minute
+                    )
+                    binding.editTextDateTime.setText(dateTime)
+                }
+            }
         }
 
         binding.chipGroupCategory.removeAllViews()
-        ReminderCategory.values().forEach { category ->
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+        ReminderCategory.entries.forEach { category ->
+            val chip = Chip(requireContext()).apply {
                 text = category.displayName
-                chipIcon = androidx.core.content.ContextCompat.getDrawable(requireContext(), category.iconRes)
+                tag = category.name
+                chipIcon = ContextCompat.getDrawable(requireContext(), category.iconRes)
                 isChipIconVisible = true
                 isCheckable = true
 
@@ -99,27 +95,81 @@ class ReminderCreateFragment : Fragment() {
             binding.chipGroupCategory.addView(chip)
         }
 
+        if (isEditing) {
+            setupEditMode()
+        }
+
         binding.buttonSave.setOnClickListener {
             val title = binding.editTextTitle.text.toString().trim()
             val description = binding.editTextDescription.text.toString().trim()
+            val dateTime = binding.editTextDateTime.text.toString().trim().ifEmpty { null }
 
-            if (title.isEmpty()) {
-                binding.tilTitle.error = "O título é obrigatório"
-                return@setOnClickListener
+            if (isEditing) {
+                val updated = currentReminder?.copy(
+                    title = title,
+                    description = description,
+                    category = selectedCategory,
+                    dateTime = dateTime
+                )
+
+                updated?.let {
+                    reminderViewModel.update(it)
+                    ReminderScheduler.cancel(requireContext(), it.id)
+                    if (!it.isCompleted) {
+                        ReminderScheduler.schedule(requireContext(), it)
+                    }
+                    findNavController().navigateUp()
+                }
+            } else {
+                val reminder = Reminder(
+                    title = title,
+                    description = description,
+                    category = selectedCategory,
+                    dateTime = dateTime
+                )
+
+                reminderViewModel.insert(reminder)
+                ReminderScheduler.schedule(requireContext(), reminder)
+                findNavController().navigateUp()
             }
+        }
+    }
 
-            binding.tilTitle.error = null
+    private fun setupEditMode() {
+        binding.buttonSave.text = "Salvar alterações"
+        binding.buttonDelete.visibility = View.VISIBLE
 
-            val reminder = Reminder(
-                title = title,
-                description = description,
-                category = selectedCategory,
-                dateTime = binding.editTextDateTime.text.toString().trim().ifEmpty { null }
-            )
+        reminderViewModel.allReminders.observe(viewLifecycleOwner) { reminders ->
+            val reminder = reminders.find { it.id == reminderId } ?: return@observe
+            currentReminder = reminder
 
-            reminderViewModel.insert(reminder)
-            ReminderScheduler.schedule(requireContext(), reminder)
-            findNavController().navigateUp()
+            if (prefilled) return@observe
+            prefilled = true
+
+            binding.editTextTitle.setText(reminder.title)
+            binding.editTextDescription.setText(reminder.description)
+            binding.editTextDateTime.setText(reminder.dateTime.orEmpty())
+            selectedCategory = reminder.category
+
+            for (i in 0 until binding.chipGroupCategory.childCount) {
+                val chip = binding.chipGroupCategory.getChildAt(i) as Chip
+                chip.isChecked = chip.tag == reminder.category
+            }
+        }
+
+        binding.buttonDelete.setOnClickListener {
+            android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Excluir lembrete")
+                .setMessage("Deseja excluir \"${currentReminder?.title}\"?")
+                .setPositiveButton("Excluir") { _, _ ->
+                    currentReminder?.let {
+                        reminderViewModel.delete(it)
+                        ReminderScheduler.cancel(requireContext(), it.id)
+                        findNavController().navigateUp()
+                    }
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
         }
     }
 
