@@ -58,4 +58,12 @@
     <!-- Estados do lembrete -->
     <color name="reminder_completed">#9E9E9E</color>
     <color name="category_default">#CCCCCC</color>
+
+    <!-- Categorias -->
+    <color name="category_work">#1F4D3A</color>
+    <color name="category_home">#3A6B52</color>
+    <color name="category_school">#5D8A6B</color>
+    <color name="category_health">#7A9E85</color>
+    <color name="category_finance">#2E5940</color>
+    <color name="category_other">#8A938D</color>
 </resources>

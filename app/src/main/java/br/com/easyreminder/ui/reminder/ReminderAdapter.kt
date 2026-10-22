@@ -5,7 +5,6 @@ import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -53,7 +52,7 @@ class ReminderAdapter(
             }
         }
 
-        val categoryColor = category?.colorHex?.toColorInt()
+        val categoryColor = category?.colorRes?.let { ContextCompat.getColor(context, it) }
             ?: ContextCompat.getColor(context, R.color.category_default)
 
         if (item.isCompleted) {
@@ -74,7 +73,7 @@ class ReminderAdapter(
             holder.itemView.alpha = 1.0f
         }
 
-        holder.binding.textViewCategory.text = category?.displayName ?: "Sem categoria"
+        holder.binding.textViewCategory.text = category?.displayName ?: context.getString(R.string.category_none)
         holder.binding.textViewCategory.setTextColor(categoryColor)
 
         val background = android.graphics.drawable.GradientDrawable()
@@ -86,7 +85,7 @@ class ReminderAdapter(
 
         if (item.dateTime != null) {
             holder.binding.textViewDateTime.visibility = android.view.View.VISIBLE
-            holder.binding.textViewDateTime.text = "🕐 ${item.dateTime}"
+            holder.binding.textViewDateTime.text = context.getString(R.string.format_date_time, item.dateTime)
         } else {
             holder.binding.textViewDateTime.visibility = android.view.View.GONE
         }
