@@ -58,6 +58,7 @@
     <!-- Estados do lembrete -->
     <color name="reminder_completed">#9E9E9E</color>
     <color name="category_default">#CCCCCC</color>
+    <color name="reminder_title">#000000</color>
 
     <!-- Categorias -->
     <color name="category_work">#1F4D3A</color>

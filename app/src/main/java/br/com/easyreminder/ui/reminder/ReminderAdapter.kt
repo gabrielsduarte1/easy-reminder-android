@@ -1,6 +1,5 @@
 package br.com.easyreminder.ui.reminder
 
-import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import br.com.easyreminder.R
 import br.com.easyreminder.databinding.ItemReminderBinding
 import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.model.ReminderCategory
+import br.com.easyreminder.model.ReminderStatus
 
 class ReminderAdapter(
     private val onClick: (Reminder) -> Unit,
@@ -55,23 +55,25 @@ class ReminderAdapter(
         val categoryColor = category?.colorRes?.let { ContextCompat.getColor(context, it) }
             ?: ContextCompat.getColor(context, R.color.category_default)
 
-        if (item.isCompleted) {
-            holder.binding.viewCategoryColor.setBackgroundColor(
-                ContextCompat.getColor(context, R.color.swipe_complete)
-            )
-            holder.binding.textViewTitle.paintFlags =
-                holder.binding.textViewTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            holder.binding.textViewTitle.setTextColor(
-                ContextCompat.getColor(context, R.color.reminder_completed)
-            )
-            holder.itemView.alpha = 0.6f
+        val status = ReminderStatus.from(item.isCompleted)
+
+        val stripeColor = status.stripeColorRes
+            ?.let { ContextCompat.getColor(context, it) }
+            ?: categoryColor
+
+        holder.binding.viewCategoryColor.setBackgroundColor(stripeColor)
+
+        holder.binding.textViewTitle.setTextColor(
+            ContextCompat.getColor(context, status.titleColorRes)
+        )
+
+        holder.binding.textViewTitle.paintFlags = if (status.isStrikeThrough) {
+            holder.binding.textViewTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
-            holder.binding.viewCategoryColor.setBackgroundColor(categoryColor)
-            holder.binding.textViewTitle.paintFlags =
-                holder.binding.textViewTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-            holder.binding.textViewTitle.setTextColor(Color.BLACK)
-            holder.itemView.alpha = 1.0f
+            holder.binding.textViewTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
+
+        holder.itemView.alpha = status.alpha
 
         holder.binding.textViewCategory.text = category?.displayName ?: context.getString(R.string.category_none)
         holder.binding.textViewCategory.setTextColor(categoryColor)
