@@ -82,7 +82,7 @@ class ReminderCreateFragment : Fragment() {
         binding.chipGroupCategory.removeAllViews()
         ReminderCategory.entries.forEach { category ->
             val chip = Chip(requireContext()).apply {
-                text = category.displayName
+                text = getString(category.displayNameRes)
                 tag = category.name
                 chipIcon = ContextCompat.getDrawable(requireContext(), category.iconRes)
                 isChipIconVisible = true

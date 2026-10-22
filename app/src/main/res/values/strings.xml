@@ -44,4 +44,12 @@
 
     <!-- Formatação -->
     <string name="format_date_time">🕐 %1$s</string>
+
+    <!-- Categorias -->
+    <string name="category_work">Trabalho</string>
+    <string name="category_home">Casa</string>
+    <string name="category_school">Estudos</string>
+    <string name="category_health">Saúde</string>
+    <string name="category_finance">Finanças</string>
+    <string name="category_other">Outros</string>
 </resources>

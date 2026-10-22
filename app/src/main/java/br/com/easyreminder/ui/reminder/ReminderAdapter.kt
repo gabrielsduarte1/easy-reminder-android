@@ -75,7 +75,8 @@ class ReminderAdapter(
 
         holder.itemView.alpha = status.alpha
 
-        holder.binding.textViewCategory.text = category?.displayName ?: context.getString(R.string.category_none)
+        holder.binding.textViewCategory.text = category?.let { context.getString(it.displayNameRes) }
+            ?: context.getString(R.string.category_none)
         holder.binding.textViewCategory.setTextColor(categoryColor)
 
         val background = android.graphics.drawable.GradientDrawable()
