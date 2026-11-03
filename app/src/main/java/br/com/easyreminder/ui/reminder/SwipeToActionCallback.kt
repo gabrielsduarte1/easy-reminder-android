@@ -5,10 +5,11 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import br.com.easyreminder.R
+import br.com.easyreminder.util.getColorCompat
+import br.com.easyreminder.util.getDrawableCompat
 
 class SwipeToActionCallback(
     context: Context,
@@ -20,14 +21,14 @@ class SwipeToActionCallback(
 ) {
 
     private val paint = Paint()
-    private val deleteColor = ContextCompat.getColor(context, R.color.swipe_delete)
-    private val completeColor = ContextCompat.getColor(context, R.color.swipe_complete)
+    private val deleteColor = context.getColorCompat(R.color.swipe_delete)
+    private val completeColor = context.getColorCompat(R.color.swipe_complete)
 
     private val deleteIcon: Drawable? =
-        ContextCompat.getDrawable(context, android.R.drawable.ic_menu_delete)
+        context.getDrawableCompat(android.R.drawable.ic_menu_delete)
 
     private val completeIcon: Drawable? =
-        ContextCompat.getDrawable(context, android.R.drawable.checkbox_on_background)
+        context.getDrawableCompat(android.R.drawable.checkbox_on_background)
 
     override fun onMove(
         recyclerView: RecyclerView,

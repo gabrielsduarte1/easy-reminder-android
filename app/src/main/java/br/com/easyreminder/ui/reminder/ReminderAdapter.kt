@@ -4,7 +4,6 @@ import android.graphics.Paint
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,6 +13,7 @@ import br.com.easyreminder.databinding.ItemReminderBinding
 import br.com.easyreminder.model.Reminder
 import br.com.easyreminder.model.ReminderCategory
 import br.com.easyreminder.model.ReminderStatus
+import br.com.easyreminder.util.getColorCompat
 
 class ReminderAdapter(
     private val onClick: (Reminder) -> Unit,
@@ -54,20 +54,17 @@ class ReminderAdapter(
             }
         }
 
-        val categoryColor = category?.colorRes?.let { ContextCompat.getColor(context, it) }
-            ?: ContextCompat.getColor(context, R.color.category_default)
+        val categoryColor = category?.let { context.getColorCompat(it.colorRes) }
+            ?: context.getColorCompat(R.color.category_default)
 
         val status = ReminderStatus.from(item.isCompleted)
 
         val stripeColor = status.stripeColorRes
-            ?.let { ContextCompat.getColor(context, it) }
+            ?.let { context.getColorCompat(it) }
             ?: categoryColor
 
         holder.binding.viewCategoryColor.setBackgroundColor(stripeColor)
-
-        holder.binding.textViewTitle.setTextColor(
-            ContextCompat.getColor(context, status.titleColorRes)
-        )
+        holder.binding.textViewTitle.setTextColor(context.getColorCompat(status.titleColorRes))
 
         holder.binding.textViewTitle.paintFlags = if (status.isStrikeThrough) {
             holder.binding.textViewTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG

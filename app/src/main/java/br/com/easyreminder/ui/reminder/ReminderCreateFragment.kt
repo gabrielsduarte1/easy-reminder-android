@@ -15,6 +15,7 @@ import br.com.easyreminder.viewmodel.ReminderViewModel
 import br.com.easyreminder.worker.ReminderScheduler
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
+import br.com.easyreminder.util.getDrawableCompat
 import br.com.easyreminder.util.showDatePicker
 import br.com.easyreminder.util.showTimePicker
 import br.com.easyreminder.util.showToast
@@ -85,7 +86,7 @@ class ReminderCreateFragment : Fragment() {
             val chip = Chip(requireContext()).apply {
                 text = getString(category.displayNameRes)
                 tag = category.name
-                chipIcon = ContextCompat.getDrawable(requireContext(), category.iconRes)
+                chipIcon = context.getDrawableCompat(category.iconRes)
                 isChipIconVisible = true
                 isCheckable = true
 
